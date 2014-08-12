@@ -1,9 +1,9 @@
-mod comp;
+mod smallstep;
 
 fn main() {
-    use comp::Number;
-    use comp::Add;
-    use comp::Multiply;
+    use smallstep::Number;
+    use smallstep::Add;
+    use smallstep::Multiply;
 
     let number = Number::new(100);
     let add  = Add::new(Number::new(1), Number::new(4));
