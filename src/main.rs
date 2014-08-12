@@ -13,8 +13,11 @@ fn main() {
         Multiply::new(Number::new(3), Number::new(4)),
     );
 
+    println!("Number: {}", number);
+    println!("Number reducable: {}", number.reducable());
     println!("Addition: {0}", add);
+    println!("Addition reducable: {}", add.reducable());
     println!("Multiplication: {0}", mult);
-    println!("Number reducable: {}", Number::new(3).reducable);
+    println!("Multiplication reducable {0}", mult.reducable());
     println!("Combination: {0}", comb);
 }

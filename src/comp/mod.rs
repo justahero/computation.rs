@@ -2,8 +2,29 @@ use std::fmt::Show;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
-pub trait Reducable {
-    fn reducable(&self) -> bool;
+pub enum Node {
+    Number(int),
+    Add(Box<Node>, Box<Node>),
+    Multiply(Box<Node>, Box<Node>)
+}
+
+impl Node {
+    pub fn reducable(&self) -> bool {
+        match *self {
+            Number(_) => { false }
+            _ => { true }
+        }
+    }
+}
+
+impl Show for Node {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        match *self {
+            Number(value)          => write!(f, "{}", value),
+            Add(ref l, ref r)      => write!(f, "{0} + {1}", l, r),
+            Multiply(ref l, ref r) => write!(f, "{0} * {1}", l, r)
+        }
+    }
 }
 
 pub struct Number {
@@ -11,62 +32,29 @@ pub struct Number {
 }
 
 impl Number {
-    pub fn new(value: int) -> Number {
-        Number{ value: value }
-    }
-}
-
-// implement Show trait for Number
-impl Show for Number {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{}", self.value)
-    }
-}
-
-impl Reducable for Number {
-    fn reducable(&self) -> bool {
-        false
+    pub fn new(value: int) -> Node {
+        Number(value)
     }
 }
 
 pub struct Add {
-    pub left: Reducable,
-    pub right: Reducable
+    pub left: Node,
+    pub right: Node
 }
 
 impl Add {
-    pub fn new(left: Reducable, right: Reducable) -> Add {
-        Add{ left: left, right: right }
+    pub fn new(left: Node, right: Node) -> Node {
+        Add(box left, box right)
     }
-}
-
-impl Show for Add {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{0} + {1}", self.left, self.right)
-    }
-}
-
-impl Reducable for Add {
-    fn reducable(&self) -> bool { true }
 }
 
 pub struct Multiply {
-    pub left: Reducable,
-    pub right: Reducable
+    pub left: Node,
+    pub right: Node,
 }
 
 impl Multiply {
-    pub fn new(left: Reducable, right: Reducable) -> Multiply {
-        Multiply{ left: left, right: right }
+    pub fn new(left: Node, right: Node) -> Node {
+        Multiply(box left, box right)
     }
-}
-
-impl Show for Multiply {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{0} * {1}", self.left, self.right)
-    }
-}
-
-impl Reducable for Multiply {
-    fn reducable(&self) -> bool { true }
 }
