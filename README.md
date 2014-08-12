@@ -1,1 +1,4 @@
-Implementations of code examples from the book Understanding Computation by Tom Stuart in Rust.
+computation.rs
+==============
+
+A few samples from the Understanding Computation book written in Rust
