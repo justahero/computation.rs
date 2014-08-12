@@ -1,0 +1,5 @@
+[package]
+
+name = "understanding-computation"
+version = "0.0.1"
+authors = [ "sebastian.ziebell@gmail.com" ]
