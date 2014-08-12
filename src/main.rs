@@ -8,7 +8,7 @@ fn main() {
     let number = Number::new(100);
     let add  = Add::new(Number::new(1), Number::new(4));
     let mult = Multiply::new(Number::new(4), Number::new(3));
-    let comb = Add::new(
+    let mut comb = Add::new(
         Multiply::new(Number::new(5), Number::new(10)),
         Multiply::new(Number::new(3), Number::new(4)),
     );
@@ -19,5 +19,11 @@ fn main() {
     println!("Addition reducable: {}", add.reducable());
     println!("Multiplication: {0}", mult);
     println!("Multiplication reducable {0}", mult.reducable());
+    println!("---")
     println!("Combination: {0}", comb);
+
+    while comb.reducable() {
+        comb = comb.reduce();
+        println!("  {0}", comb);
+    }
 }

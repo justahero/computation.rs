@@ -2,6 +2,7 @@ use std::fmt::Show;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
+#[deriving(Clone)]
 pub enum Node {
     Number(int),
     Add(Box<Node>, Box<Node>),
@@ -13,6 +14,35 @@ impl Node {
         match *self {
             Number(_) => { false }
             _ => { true }
+        }
+    }
+    pub fn value(&self) -> int {
+        match *self {
+            Number(v) => { v },
+            _ => fail!("Type has no value: {}", *self)
+        }
+    }
+    pub fn reduce(&self) -> Node {
+        match *self {
+            Add(ref l, ref r) => {
+                if l.reducable() {
+                    Add(box l.reduce(), r.clone())
+                } else if r.reducable() {
+                    Add(l.clone(), box r.reduce())
+                } else {
+                    Number(l.value() + r.value())
+                }
+            }
+            Multiply(ref l, ref r) => {
+                if l.reducable() {
+                    Multiply(box l.reduce(), r.clone())
+                } else if r.reducable() {
+                    Multiply(l.clone(), box r.reduce())
+                } else {
+                    Number(l.value() * r.value())
+                }
+            }
+            _ => fail!("Non reducable type found: {}", *self)
         }
     }
 }
