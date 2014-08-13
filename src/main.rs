@@ -3,7 +3,7 @@ mod smallstep;
 fn main() {
     use smallstep::Number;
     use smallstep::Add;
-    use smallstep::Machine;
+    use smallstep::machine::Machine;
     use smallstep::Multiply;
 
     let number = Number::new(100);

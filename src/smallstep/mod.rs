@@ -2,6 +2,8 @@ use std::fmt::Show;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
+pub mod machine;
+
 #[deriving(Clone)]
 pub enum Node {
     Number(int),
@@ -86,24 +88,5 @@ pub struct Multiply {
 impl Multiply {
     pub fn new(left: Node, right: Node) -> Node {
         Multiply(box left, box right)
-    }
-}
-
-pub struct Machine {
-    pub expression: Node
-}
-
-impl Machine {
-    pub fn new(expression: Node) -> Machine {
-        Machine{ expression: expression }
-    }
-
-    pub fn run(&self) {
-        let mut node = self.expression.clone();
-        while node.reducable() {
-            println!("{}", node);
-            node = node.reduce();
-        }
-        println!("{}", node);
     }
 }
