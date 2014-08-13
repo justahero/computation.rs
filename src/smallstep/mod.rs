@@ -17,6 +17,8 @@ pub enum Node {
 }
 
 impl Node {
+    pub fn number(value: int) -> Box<Node> { box Number(value) }
+
     pub fn reducable(&self) -> bool {
         match *self {
             Number(_)  => { false }
@@ -30,33 +32,33 @@ impl Node {
             _ => fail!("Type has no value: {}", *self)
         }
     }
-    pub fn reduce(&self, environment: &mut Environment) -> Node {
+    pub fn reduce(&self, environment: &mut Environment) -> Box<Node> {
         match *self {
             Add(ref l, ref r) => {
                 if l.reducable() {
-                    Add(box l.reduce(environment), r.clone())
+                    Add::new(l.reduce(environment), r.clone())
                 } else if r.reducable() {
-                    Add(l.clone(), box r.reduce(environment))
+                    Add::new(l.clone(), r.reduce(environment))
                 } else {
-                    Number(l.value() + r.value())
+                    Node::number(l.value() + r.value())
                 }
             }
             Multiply(ref l, ref r) => {
                 if l.reducable() {
-                    Multiply(box l.reduce(environment), r.clone())
+                    Multiply::new(l.reduce(environment), r.clone())
                 } else if r.reducable() {
-                    Multiply(l.clone(), box r.reduce(environment))
+                    Multiply::new(l.clone(), r.reduce(environment))
                 } else {
-                    Number(l.value() * r.value())
+                    Node::number(l.value() * r.value())
                 }
             }
             LessThan(ref l, ref r) => {
                 if l.reducable() {
-                    LessThan(box l.reduce(environment), r.clone())
+                    LessThan::new(l.reduce(environment), r.clone())
                 } else if r.reducable() {
-                    LessThan(l.clone(), box r.reduce(environment))
+                    LessThan::new(l.clone(), r.reduce(environment))
                 } else {
-                    Boolean(l.value() < r.value())
+                    Boolean::new(l.value() < r.value())
                 }
             }
             _ => fail!("Non reducable type found: {}", *self)
@@ -76,35 +78,25 @@ impl Show for Node {
     }
 }
 
-pub struct Number {
-    pub value: int
-}
-
-impl Number {
-    pub fn new(value: int) -> Node {
-        Number(value)
-    }
-}
-
 pub struct Add {
-    pub left: Node,
-    pub right: Node
+    pub left: Box<Node>,
+    pub right: Box<Node>
 }
 
 impl Add {
-    pub fn new(left: Node, right: Node) -> Node {
-        Add(box left, box right)
+    pub fn new(left: Box<Node>, right: Box<Node>) -> Box<Node> {
+        box Add(left, right)
     }
 }
 
 pub struct Multiply {
-    pub left: Node,
-    pub right: Node,
+    pub left: Box<Node>,
+    pub right: Box<Node>,
 }
 
 impl Multiply {
-    pub fn new(left: Node, right: Node) -> Node {
-        Multiply(box left, box right)
+    pub fn new(left: Box<Node>, right: Box<Node>) -> Box<Node> {
+        box Multiply(left, right)
     }
 }
 
@@ -113,18 +105,18 @@ pub struct Boolean {
 }
 
 impl Boolean {
-    pub fn new(value: bool) -> Node {
-        Boolean(value)
+    pub fn new(value: bool) -> Box<Node> {
+        box Boolean(value)
     }
 }
 
 pub struct LessThan {
-    pub left: Node,
-    pub right: Node,
+    pub left: Box<Node>,
+    pub right: Box<Node>,
 }
 
 impl LessThan {
-    pub fn new(left: Node, right: Node) -> Node {
-        LessThan(box left, box right)
+    pub fn new(left: Box<Node>, right: Box<Node>) -> Box<Node> {
+        box LessThan(left, right)
     }
 }

@@ -2,11 +2,11 @@ use smallstep::Node;
 use smallstep::environment::Environment;
 
 pub struct Machine {
-    pub expression: Node
+    pub expression: Box<Node>
 }
 
 impl Machine {
-    pub fn new(expression: Node) -> Machine {
+    pub fn new(expression: Box<Node>) -> Machine {
         Machine{ expression: expression }
     }
 
