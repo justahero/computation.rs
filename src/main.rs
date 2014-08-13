@@ -21,6 +21,15 @@ fn main() {
     println!("Variable x = {}", variable.reduce(&mut test_env));
 
     println!("---")
+    let mut env = Environment::new();
+    env.add("x", Node::number(3));
+    env.add("y", Node::number(4));
+    Machine::new(
+        Node::add(Node::variable("x"), Node::variable("y")),
+        env
+    ).run();
+
+    println!("---")
     Machine::new(
         Node::add(
             Node::multiply(Node::number(5), Node::number(10)),
