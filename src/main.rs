@@ -1,12 +1,14 @@
+use smallstep::Number;
+use smallstep::Boolean;
+use smallstep::LessThan;
+use smallstep::Add;
+use smallstep::Multiply;
+use smallstep::machine::Machine;
+use smallstep::environment::Environment;
+
 mod smallstep;
 
 fn main() {
-    use smallstep::Number;
-    use smallstep::Boolean;
-    use smallstep::LessThan;
-    use smallstep::Add;
-    use smallstep::machine::Machine;
-    use smallstep::Multiply;
 
     println!("Number: {}", Number::new(100));
     println!("Boolean: {}", Boolean::new(false));
@@ -23,10 +25,10 @@ fn main() {
             Multiply::new(Number::new(5), Number::new(10)),
             Multiply::new(Number::new(3), Number::new(4)),
         )
-    ).run();
+    ).run(&mut Environment::new());
 
     println!("---")
     Machine::new(
         LessThan::new(Number::new(10), Add::new(Number::new(4), Number::new(5))),
-    ).run();
+    ).run(&mut Environment::new());
 }

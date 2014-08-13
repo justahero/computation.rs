@@ -2,7 +2,10 @@ use std::fmt::Show;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
+use smallstep::environment::Environment;
+
 pub mod machine;
+pub mod environment;
 
 #[deriving(Clone)]
 pub enum Node {
@@ -27,31 +30,31 @@ impl Node {
             _ => fail!("Type has no value: {}", *self)
         }
     }
-    pub fn reduce(&self) -> Node {
+    pub fn reduce(&self, environment: &mut Environment) -> Node {
         match *self {
             Add(ref l, ref r) => {
                 if l.reducable() {
-                    Add(box l.reduce(), r.clone())
+                    Add(box l.reduce(environment), r.clone())
                 } else if r.reducable() {
-                    Add(l.clone(), box r.reduce())
+                    Add(l.clone(), box r.reduce(environment))
                 } else {
                     Number(l.value() + r.value())
                 }
             }
             Multiply(ref l, ref r) => {
                 if l.reducable() {
-                    Multiply(box l.reduce(), r.clone())
+                    Multiply(box l.reduce(environment), r.clone())
                 } else if r.reducable() {
-                    Multiply(l.clone(), box r.reduce())
+                    Multiply(l.clone(), box r.reduce(environment))
                 } else {
                     Number(l.value() * r.value())
                 }
             }
             LessThan(ref l, ref r) => {
                 if l.reducable() {
-                    LessThan(box l.reduce(), r.clone())
+                    LessThan(box l.reduce(environment), r.clone())
                 } else if r.reducable() {
-                    LessThan(l.clone(), box r.reduce())
+                    LessThan(l.clone(), box r.reduce(environment))
                 } else {
                     Boolean(l.value() < r.value())
                 }
