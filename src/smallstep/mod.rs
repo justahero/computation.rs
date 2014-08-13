@@ -7,6 +7,7 @@ pub mod machine;
 #[deriving(Clone)]
 pub enum Node {
     Number(int),
+    Boolean(bool),
     Add(Box<Node>, Box<Node>),
     Multiply(Box<Node>, Box<Node>)
 }
@@ -14,13 +15,15 @@ pub enum Node {
 impl Node {
     pub fn reducable(&self) -> bool {
         match *self {
-            Number(_) => { false }
+            Number(_)  => { false }
+            Boolean(_) => { false }
             _ => { true }
         }
     }
     pub fn value(&self) -> int {
         match *self {
-            Number(v) => { v },
+            Number(v)  => { v },
+            // Boolean(v) => { v },
             _ => fail!("Type has no value: {}", *self)
         }
     }
@@ -53,6 +56,7 @@ impl Show for Node {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match *self {
             Number(value)          => write!(f, "{}", value),
+            Boolean(value)         => write!(f, "{}", value),
             Add(ref l, ref r)      => write!(f, "{0} + {1}", l, r),
             Multiply(ref l, ref r) => write!(f, "{0} * {1}", l, r)
         }
@@ -66,6 +70,16 @@ pub struct Number {
 impl Number {
     pub fn new(value: int) -> Node {
         Number(value)
+    }
+}
+
+pub struct Boolean {
+    pub value: bool
+}
+
+impl Boolean {
+    pub fn new(value: bool) -> Node {
+        Boolean(value)
     }
 }
 
