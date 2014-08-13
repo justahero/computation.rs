@@ -17,18 +17,16 @@ fn main() {
     let mult = Multiply::new(Number::new(4), Number::new(3));
     println!("Multiplication: {0}", mult);
 
-    let machine = Machine::new(
+    println!("---")
+    Machine::new(
         Add::new(
             Multiply::new(Number::new(5), Number::new(10)),
             Multiply::new(Number::new(3), Number::new(4)),
         )
-    );
-    println!("Running Machine")
-    machine.run();
+    ).run();
 
-    let comparison = Machine::new(
-        LessThan::new(Number::new(10), Number::new(20)),
-    );
-    println!("LessThan")
-    comparison.run();
+    println!("---")
+    Machine::new(
+        LessThan::new(Number::new(10), Add::new(Number::new(4), Number::new(5))),
+    ).run();
 }
