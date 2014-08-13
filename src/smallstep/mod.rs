@@ -14,6 +14,7 @@ pub enum Node {
     Multiply(Box<Node>, Box<Node>),
     Boolean(bool),
     LessThan(Box<Node>, Box<Node>),
+    Variable(String),
 }
 
 impl Node {
@@ -26,6 +27,8 @@ impl Node {
     pub fn boolean(value: bool) -> Box<Node> { box Boolean(value) }
 
     pub fn less_than(left: Box<Node>, right: Box<Node>) -> Box<Node> { box LessThan(left, right) }
+
+    pub fn variable(name: &str) -> Box<Node> { box Variable(name.to_string()) }
 
     pub fn reducable(&self) -> bool {
         match *self {
@@ -69,6 +72,9 @@ impl Node {
                     Node::boolean(l.value() < r.value())
                 }
             }
+            Variable(ref name) => {
+                environment.get(name.clone())
+            }
             _ => fail!("Non reducable type found: {}", *self)
         }
     }
@@ -82,6 +88,7 @@ impl Show for Node {
             Multiply(ref l, ref r) => write!(f, "{0} * {1}", l, r),
             Boolean(value)         => write!(f, "{}", value),
             LessThan(ref l, ref r) => write!(f, "{0} < {1}", l, r),
+            Variable(ref value)    => write!(f, "{}", value),
         }
     }
 }

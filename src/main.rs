@@ -15,6 +15,11 @@ fn main() {
     let mult = Node::multiply(Node::number(4), Node::number(3));
     println!("Multiplication: {0}", mult);
 
+    let mut test_env = Environment::new();
+    test_env.add("x", Node::number(2));
+    let variable = Node::variable("x");
+    println!("Variable x = {}", variable.reduce(&mut test_env));
+
     println!("---")
     Machine::new(
         Node::add(
