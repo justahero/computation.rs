@@ -23,6 +23,10 @@ impl Node {
 
     pub fn multiply(left: Box<Node>, right: Box<Node>) -> Box<Node> { box Multiply(left, right) }
 
+    pub fn boolean(value: bool) -> Box<Node> { box Boolean(value) }
+
+    pub fn less_than(left: Box<Node>, right: Box<Node>) -> Box<Node> { box LessThan(left, right) }
+
     pub fn reducable(&self) -> bool {
         match *self {
             Number(_)  => { false }
@@ -58,11 +62,11 @@ impl Node {
             }
             LessThan(ref l, ref r) => {
                 if l.reducable() {
-                    LessThan::new(l.reduce(environment), r.clone())
+                    Node::less_than(l.reduce(environment), r.clone())
                 } else if r.reducable() {
-                    LessThan::new(l.clone(), r.reduce(environment))
+                    Node::less_than(l.clone(), r.reduce(environment))
                 } else {
-                    Boolean::new(l.value() < r.value())
+                    Node::boolean(l.value() < r.value())
                 }
             }
             _ => fail!("Non reducable type found: {}", *self)
@@ -79,26 +83,5 @@ impl Show for Node {
             Boolean(value)         => write!(f, "{}", value),
             LessThan(ref l, ref r) => write!(f, "{0} < {1}", l, r),
         }
-    }
-}
-
-pub struct Boolean {
-    pub value: bool
-}
-
-impl Boolean {
-    pub fn new(value: bool) -> Box<Node> {
-        box Boolean(value)
-    }
-}
-
-pub struct LessThan {
-    pub left: Box<Node>,
-    pub right: Box<Node>,
-}
-
-impl LessThan {
-    pub fn new(left: Box<Node>, right: Box<Node>) -> Box<Node> {
-        box LessThan(left, right)
     }
 }

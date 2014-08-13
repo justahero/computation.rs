@@ -1,8 +1,4 @@
 use smallstep::Node;
-use smallstep::Boolean;
-use smallstep::LessThan;
-use smallstep::Add;
-use smallstep::Multiply;
 use smallstep::machine::Machine;
 use smallstep::environment::Environment;
 
@@ -11,7 +7,7 @@ mod smallstep;
 fn main() {
 
     println!("Number: {}", Node::number(100));
-    println!("Boolean: {}", Boolean::new(false));
+    println!("Boolean: {}", Node::boolean(false));
 
     let add = Node::add(Node::number(1), Node::number(4));
     println!("Addition: {0}", add);
@@ -29,6 +25,6 @@ fn main() {
 
     println!("---")
     Machine::new(
-        LessThan::new(Node::number(10), Node::add(Node::number(4), Node::number(5))),
+        Node::less_than(Node::number(10), Node::add(Node::number(4), Node::number(5))),
     ).run(&mut Environment::new());
 }
