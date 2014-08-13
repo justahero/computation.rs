@@ -4,8 +4,8 @@ use smallstep::environment::Environment;
 
 mod smallstep;
 
-fn main() {
 
+fn main() {
     println!("Number: {}", Node::number(100));
     println!("Boolean: {}", Node::boolean(false));
 
@@ -24,12 +24,16 @@ fn main() {
     Machine::new(
         Node::add(
             Node::multiply(Node::number(5), Node::number(10)),
-            Node::multiply(Node::number(3), Node::number(4)),
-        )
-    ).run(&mut Environment::new());
+            Node::multiply(Node::number(3), Node::number(4))
+        ),
+        Environment::new()
+    ).run();
 
     println!("---")
-    Machine::new(
-        Node::less_than(Node::number(10), Node::add(Node::number(4), Node::number(5))),
-    ).run(&mut Environment::new());
+    Machine::new_with_empty_env(
+        Node::less_than(
+            Node::number(10),
+            Node::add(Node::number(4), Node::number(5))
+        )
+    ).run();
 }
