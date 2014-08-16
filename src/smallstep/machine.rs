@@ -27,3 +27,42 @@ impl Machine {
         println!("{}", self.expression);
     }
 }
+
+#[test]
+fn test_create_new_machine() {
+    let machine = Machine::new(Node::number(1), Environment::new());
+    assert_eq!(1, machine.expression.value());
+}
+
+#[test]
+fn test_create_new_machine_with_empty_environment() {
+    let machine = Machine::new_with_empty_env(Node::number(2));
+    assert_eq!(2, machine.expression.value());
+}
+
+#[test]
+fn test_run_more_complex_ast() {
+    let add = Node::add(
+        Node::multiply(Node::number(2), Node::number(4)),
+        Node::multiply(Node::number(3), Node::number(5)),
+    );
+    let mut machine = Machine::new_with_empty_env(add);
+    machine.run();
+    assert_eq!(23, machine.expression.value());
+}
+
+#[test]
+fn test_run_complex_ast_with_variables() {
+    let mut env = Environment::new();
+    env.add("y", Node::number(2));
+    env.add("x", Node::add(Node::variable("y"), Node::number(10)));
+
+    let mult = Node::multiply(
+        Node::add(Node::number(3), Node::variable("x")),
+        Node::number(10)
+    );
+    let mut machine = Machine::new(mult, env);
+    // (3 + (2 + 10)) * 10
+    machine.run();
+    assert_eq!(150, machine.expression.value());
+}
