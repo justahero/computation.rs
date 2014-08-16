@@ -1,9 +1,11 @@
-use smallstep::Node;
-use smallstep::machine::Machine;
-use smallstep::environment::Environment;
+#![feature(globs)]
 
-mod smallstep;
+extern crate computation;
 
+use computation::smallstep;
+use computation::smallstep::Node;
+use computation::smallstep::environment::*;
+use computation::smallstep::machine::*;
 
 fn main() {
     println!("Number: {}", Node::number(100));
