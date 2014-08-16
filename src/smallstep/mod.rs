@@ -17,6 +17,7 @@ pub enum Node {
     Variable(String),
     DoNothing,
     Assign(String, Box<Node>),
+    If(bool, Box<Node>, Box<Node>),
 }
 
 impl Node {
@@ -35,6 +36,10 @@ impl Node {
     pub fn do_nothing() -> Box<Node> { box DoNothing }
 
     pub fn assign(name: String, expression: Box<Node>) -> Box<Node> { box Assign(name, expression) }
+
+    pub fn if_node(condition: bool, left: Box<Node>, right: Box<Node>) -> Box<Node> { box If(condition, left, right) }
+
+    // pub fn if_else_node() -> Box<Node> {}
 
     pub fn reducable(&self) -> bool {
         match *self {
@@ -114,6 +119,7 @@ impl Show for Node {
             Variable(ref value)    => write!(f, "{}", value),
             DoNothing              => write!(f, "do-nothing"),
             Assign(ref n, ref e)   => write!(f, "{0} = {1}", n, e),
+            If(cond, ref l, ref r) => write!(f, "if ({0}) {1} else {2}", cond, l, r),
         }
     }
 }
@@ -214,4 +220,10 @@ fn test_reduce_assignment_node() {
     let mut env = Environment::new();
     assert_eq!("do-nothing".to_string(), assign.reduce(&mut env).to_string());
     assert_eq!(2, env.get("x".to_string()).value());
+}
+
+#[test]
+fn test_create_if_conditional() {
+    let if_node = Node::if_node(true, Node::number(1), Node::number(2));
+    assert_eq!("if (true) 1 else 2".to_string(), if_node.to_string());
 }
