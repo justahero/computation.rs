@@ -1,3 +1,7 @@
+use std::fmt::Show;
+use std::fmt::Formatter;
+use std::fmt::Result;
+
 use std::collections::hashmap::HashMap;
 
 use smallstep::Node;
@@ -27,6 +31,17 @@ impl Environment {
     }
 }
 
+impl Show for Environment {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        let mut parts = Vec::new();
+        for (variable, value) in self.vars.iter() {
+            parts.push(format!("{0}={1}", variable, value))
+        };
+        let text = parts.connect(", ");
+        write!(f, "({0})", text)
+    }
+}
+
 #[test]
 fn test_add_variable_to_environment() {
     let mut env = Environment::new();
@@ -41,4 +56,12 @@ fn test_insert_variable_to_environment() {
     env.add("x".to_string(), Node::number(2));
     env.insert("x".to_string(), Node::number(4));
     assert_eq!(4, env.get("x".to_string()).value());
+}
+
+#[test]
+fn test_write_environment_with_variables() {
+    let mut env = Environment::new();
+    env.add("y".to_string(), Node::number(4));
+    env.add("x".to_string(), Node::number(5));
+    assert_eq!("(y=4, x=5)".to_string(), env.to_string());
 }

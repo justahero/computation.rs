@@ -21,10 +21,10 @@ impl Machine {
 
     pub fn run(&mut self) {
         while self.expression.reducable() {
-            println!("{}", self.expression);
+            println!("{0}, {1}", self.expression, self.environment);
             self.step();
         }
-        println!("{}", self.expression);
+        println!("{0}, {1}", self.expression, self.environment);
     }
 }
 
