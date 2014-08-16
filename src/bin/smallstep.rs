@@ -2,7 +2,6 @@
 
 extern crate computation;
 
-use computation::smallstep;
 use computation::smallstep::Node;
 use computation::smallstep::environment::*;
 use computation::smallstep::machine::*;
