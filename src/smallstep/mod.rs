@@ -90,6 +90,14 @@ impl Node {
             Variable(ref name) => {
                 environment.get(name.clone())
             }
+            Assign(ref name, ref expression) => {
+                if expression.reducable() {
+                    Node::assign(name.clone(), expression.reduce(environment))
+                } else {
+                    environment.insert(name.clone(), expression.clone());
+                    Node::do_nothing()
+                }
+            }
             _ => fail!("Non reducable type found: {}", *self)
         }
     }
@@ -198,4 +206,12 @@ fn test_creates_assignment_node() {
     let assign = Node::assign("x".to_string(), Node::number(2));
     assert_eq!(true, assign.reducable());
     assert_eq!("x = 2".to_string(), assign.to_string());
+}
+
+#[test]
+fn test_reduce_assignment_node() {
+    let assign = Node::assign("x".to_string(), Node::number(2));
+    let mut env = Environment::new();
+    assert_eq!("do-nothing".to_string(), assign.reduce(&mut env).to_string());
+    assert_eq!(2, env.get("x".to_string()).value());
 }
