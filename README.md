@@ -58,8 +58,11 @@ machine.run();
 // => do-nothing, (x = 17, y = 12)
 ```
 
-Conditionals can be expressed with If nodes for example:
+Conditionals can be expressed with If nodes.
 
 ```rust
-
+let statement = Node::if_else_cond(Node::boolean(true), Node::number(1), Node::number(10));
+Machine::new(statement, Environment::new()).run();
+// => if true 1 else 10
+// => 1
 ```

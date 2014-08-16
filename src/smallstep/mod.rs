@@ -17,7 +17,7 @@ pub enum Node {
     Variable(String),
     DoNothing,
     Assign(String, Box<Node>),
-    If(bool, Box<Node>, Box<Node>),
+    If(Box<Node>, Box<Node>, Box<Node>),
 }
 
 impl Node {
@@ -37,9 +37,9 @@ impl Node {
 
     pub fn assign(name: String, expression: Box<Node>) -> Box<Node> { box Assign(name, expression) }
 
-    pub fn if_node(condition: bool, left: Box<Node>, right: Box<Node>) -> Box<Node> { box If(condition, left, right) }
+    pub fn if_else_cond(condition: Box<Node>, left: Box<Node>, right: Box<Node>) -> Box<Node> { box If(condition, left, right) }
 
-    // pub fn if_else_node() -> Box<Node> {}
+    pub fn if_cond(condition: Box<Node>, left: Box<Node>) -> Box<Node> { box If(condition, left, Node::do_nothing()) }
 
     pub fn reducable(&self) -> bool {
         match *self {
@@ -103,6 +103,17 @@ impl Node {
                     Node::do_nothing()
                 }
             }
+            If(ref condition, ref l, ref r) => {
+                if condition.reducable() {
+                    Node::if_else_cond(condition.reduce(environment), l.clone(), r.clone())
+                } else {
+                    if condition.condition() {
+                        l.clone()
+                    } else {
+                        r.clone()
+                    }
+                }
+            }
             _ => fail!("Non reducable type found: {}", *self)
         }
     }
@@ -111,15 +122,15 @@ impl Node {
 impl Show for Node {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match *self {
-            Number(value)          => write!(f, "{}", value),
-            Add(ref l, ref r)      => write!(f, "{0} + {1}", l, r),
-            Multiply(ref l, ref r) => write!(f, "{0} * {1}", l, r),
-            Boolean(value)         => write!(f, "{}", value),
-            LessThan(ref l, ref r) => write!(f, "{0} < {1}", l, r),
-            Variable(ref value)    => write!(f, "{}", value),
-            DoNothing              => write!(f, "do-nothing"),
-            Assign(ref n, ref e)   => write!(f, "{0} = {1}", n, e),
-            If(cond, ref l, ref r) => write!(f, "if ({0}) {1} else {2}", cond, l, r),
+            Number(value)           => write!(f, "{}", value),
+            Add(ref l, ref r)       => write!(f, "{0} + {1}", l, r),
+            Multiply(ref l, ref r)  => write!(f, "{0} * {1}", l, r),
+            Boolean(value)          => write!(f, "{}", value),
+            LessThan(ref l, ref r)  => write!(f, "{0} < {1}", l, r),
+            Variable(ref value)     => write!(f, "{}", value),
+            DoNothing               => write!(f, "do-nothing"),
+            Assign(ref n, ref e)    => write!(f, "{0} = {1}", n, e),
+            If(ref c, ref l, ref r) => write!(f, "if ({0}) {1} else {2}", c, l, r),
         }
     }
 }
@@ -224,6 +235,27 @@ fn test_reduce_assignment_node() {
 
 #[test]
 fn test_create_if_conditional() {
-    let if_node = Node::if_node(true, Node::number(1), Node::number(2));
-    assert_eq!("if (true) 1 else 2".to_string(), if_node.to_string());
+    let if_cond = Node::if_else_cond(Node::boolean(true), Node::number(1), Node::number(2));
+    assert_eq!("if (true) 1 else 2".to_string(), if_cond.to_string());
+}
+
+#[test]
+fn test_run_if_else_conditional_consequence() {
+    let cond = Node::if_else_cond(Node::boolean(true), Node::number(4), Node::number(8));
+    let mut env = Environment::new();
+    assert_eq!(4, cond.reduce(&mut env).value());
+}
+
+#[test]
+fn test_run_if_else_conditional_alternative() {
+    let cond = Node::if_else_cond(Node::boolean(false), Node::number(4), Node::number(8));
+    let mut env = Environment::new();
+    assert_eq!(8, cond.reduce(&mut env).value());
+}
+
+#[test]
+fn test_run_if_conditional_with_empty_else() {
+    let cond = Node::if_cond(Node::boolean(false), Node::number(1));
+    let mut env = Environment::new();
+    assert_eq!("do-nothing".to_string(), cond.reduce(&mut env).to_string());
 }
