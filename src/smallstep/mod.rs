@@ -15,6 +15,8 @@ pub enum Node {
     Boolean(bool),
     LessThan(Box<Node>, Box<Node>),
     Variable(String),
+    DoNothing,
+    Assign(String, Box<Node>),
 }
 
 impl Node {
@@ -28,12 +30,17 @@ impl Node {
 
     pub fn less_than(left: Box<Node>, right: Box<Node>) -> Box<Node> { box LessThan(left, right) }
 
-    pub fn variable(name: &str) -> Box<Node> { box Variable(name.to_string()) }
+    pub fn variable(name: String) -> Box<Node> { box Variable(name) }
+
+    pub fn do_nothing() -> Box<Node> { box DoNothing }
+
+    pub fn assign(name: String, expression: Box<Node>) -> Box<Node> { box Assign(name, expression) }
 
     pub fn reducable(&self) -> bool {
         match *self {
-            Number(_)  => { false }
-            Boolean(_) => { false }
+            Number(_)   => { false }
+            Boolean(_)  => { false }
+            DoNothing   => { false }
             _ => { true }
         }
     }
@@ -83,6 +90,14 @@ impl Node {
             Variable(ref name) => {
                 environment.get(name.clone())
             }
+            Assign(ref name, ref expression) => {
+                if expression.reducable() {
+                    Node::assign(name.clone(), expression.reduce(environment))
+                } else {
+                    environment.insert(name.clone(), expression.clone());
+                    Node::do_nothing()
+                }
+            }
             _ => fail!("Non reducable type found: {}", *self)
         }
     }
@@ -97,6 +112,8 @@ impl Show for Node {
             Boolean(value)         => write!(f, "{}", value),
             LessThan(ref l, ref r) => write!(f, "{0} < {1}", l, r),
             Variable(ref value)    => write!(f, "{}", value),
+            DoNothing              => write!(f, "do-nothing"),
+            Assign(ref n, ref e)   => write!(f, "{0} = {1}", n, e),
         }
     }
 }
@@ -164,15 +181,37 @@ fn test_reduce_less_than_node() {
 
 #[test]
 fn test_create_variable() {
-    let var = Node::variable("x");
+    let var = Node::variable("x".to_string());
     assert_eq!("x".to_string(), var.to_string());
 }
 
 #[test]
 fn test_environment_resolve_variable() {
-    let var = Node::variable("y");
+    let var = Node::variable("y".to_string());
     let mut env = Environment::new();
-    env.add("y", Node::number(2));
+    env.add("y".to_string(), Node::number(2));
     assert_eq!(2, var.reduce(&mut env).value());
     assert_eq!("2".to_string(), var.reduce(&mut env).to_string());
+}
+
+#[test]
+fn test_creates_do_nothing_node() {
+    let do_nothing = Node::do_nothing();
+    assert_eq!(false, do_nothing.reducable());
+    assert_eq!("do-nothing".to_string(), do_nothing.to_string());
+}
+
+#[test]
+fn test_creates_assignment_node() {
+    let assign = Node::assign("x".to_string(), Node::number(2));
+    assert_eq!(true, assign.reducable());
+    assert_eq!("x = 2".to_string(), assign.to_string());
+}
+
+#[test]
+fn test_reduce_assignment_node() {
+    let assign = Node::assign("x".to_string(), Node::number(2));
+    let mut env = Environment::new();
+    assert_eq!("do-nothing".to_string(), assign.reduce(&mut env).to_string());
+    assert_eq!(2, env.get("x".to_string()).value());
 }

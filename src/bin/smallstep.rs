@@ -1,9 +1,10 @@
-use smallstep::Node;
-use smallstep::machine::Machine;
-use smallstep::environment::Environment;
+#![feature(globs)]
 
-mod smallstep;
+extern crate computation;
 
+use computation::smallstep::Node;
+use computation::smallstep::environment::*;
+use computation::smallstep::machine::*;
 
 fn main() {
     println!("Number: {}", Node::number(100));
@@ -16,16 +17,16 @@ fn main() {
     println!("Multiplication: {0}", mult);
 
     let mut test_env = Environment::new();
-    test_env.add("x", Node::number(2));
-    let variable = Node::variable("x");
+    test_env.add("x".to_string(), Node::number(2));
+    let variable = Node::variable("x".to_string());
     println!("Variable x = {}", variable.reduce(&mut test_env));
 
     println!("---")
     let mut env = Environment::new();
-    env.add("x", Node::number(3));
-    env.add("y", Node::number(4));
+    env.add("x".to_string(), Node::number(3));
+    env.add("y".to_string(), Node::number(4));
     Machine::new(
-        Node::add(Node::variable("x"), Node::variable("y")),
+        Node::add(Node::variable("x".to_string()), Node::variable("y".to_string())),
         env
     ).run();
 
@@ -45,4 +46,15 @@ fn main() {
             Node::add(Node::number(4), Node::number(5))
         )
     ).run();
+
+    println!("---")
+    let statement = Node::assign(
+        "x".to_string(),
+        Node::add(Node::variable("x".to_string()), Node::number(1))
+    );
+    let mut statement_env = Environment::new();
+    statement_env.add("x".to_string(), Node::number(2));
+    let mut machine = Machine::new(statement, statement_env);
+    machine.run();
+    println!("x: {}", machine.environment.get("x".to_string()));
 }

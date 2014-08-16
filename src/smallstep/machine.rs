@@ -3,7 +3,7 @@ use smallstep::environment::Environment;
 
 pub struct Machine {
     expression: Box<Node>,
-    environment: Environment
+    pub environment: Environment
 }
 
 impl Machine {
@@ -21,10 +21,10 @@ impl Machine {
 
     pub fn run(&mut self) {
         while self.expression.reducable() {
-            println!("{}", self.expression);
+            println!("{0}, {1}", self.expression, self.environment);
             self.step();
         }
-        println!("{}", self.expression);
+        println!("{0}, {1}", self.expression, self.environment);
     }
 }
 
@@ -54,15 +54,25 @@ fn test_run_more_complex_ast() {
 #[test]
 fn test_run_complex_ast_with_variables() {
     let mut env = Environment::new();
-    env.add("y", Node::number(2));
-    env.add("x", Node::add(Node::variable("y"), Node::number(10)));
+    env.add("y".to_string(), Node::number(2));
+    env.add("x".to_string(), Node::add(Node::variable("y".to_string()), Node::number(10)));
 
     let mult = Node::multiply(
-        Node::add(Node::number(3), Node::variable("x")),
+        Node::add(Node::number(3), Node::variable("x".to_string())),
         Node::number(10)
     );
     let mut machine = Machine::new(mult, env);
     // (3 + (2 + 10)) * 10
     machine.run();
     assert_eq!(150, machine.expression.value());
+}
+
+#[test]
+fn test_environment_after_assignment() {
+    let assign = Node::assign("x".to_string(), Node::number(5));
+
+    let mut machine = Machine::new_with_empty_env(assign);
+    machine.run();
+
+    assert_eq!(5, machine.environment.get("x".to_string()).value());
 }
