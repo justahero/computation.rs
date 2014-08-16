@@ -146,3 +146,33 @@ fn test_reduce_multiply_node() {
     assert_eq!(35, mult.reduce(&mut env).value());
     assert_eq!("35".to_string(), mult.reduce(&mut env).to_string());
 }
+
+#[test]
+fn test_creates_less_than_node() {
+    let lessthan = Node::less_than(Node::number(12), Node::number(8));
+    assert_eq!(true, lessthan.reducable());
+    assert_eq!("12 < 8".to_string(), lessthan.to_string());
+}
+
+#[test]
+fn test_reduce_less_than_node() {
+    let less = Node::less_than(Node::number(7), Node::number(8));
+    let mut env = Environment::new();
+    assert_eq!(true, less.reduce(&mut env).condition());
+    assert_eq!("true".to_string(), less.reduce(&mut env).to_string());
+}
+
+#[test]
+fn test_create_variable() {
+    let var = Node::variable("x");
+    assert_eq!("x".to_string(), var.to_string());
+}
+
+#[test]
+fn test_environment_resolve_variable() {
+    let var = Node::variable("y");
+    let mut env = Environment::new();
+    env.add("y", Node::number(2));
+    assert_eq!(2, var.reduce(&mut env).value());
+    assert_eq!("2".to_string(), var.reduce(&mut env).to_string());
+}

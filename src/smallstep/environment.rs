@@ -22,3 +22,11 @@ impl Environment {
         }
     }
 }
+
+#[test]
+fn test_add_variable_to_environment() {
+    let mut env = Environment::new();
+    env.add("x", Node::number(1));
+    assert_eq!(1, env.get("x".to_string()).value());
+    assert_eq!("1".to_string(), env.get("x".to_string()).to_string());
+}
