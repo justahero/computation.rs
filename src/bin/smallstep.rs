@@ -54,5 +54,7 @@ fn main() {
     );
     let mut statement_env = Environment::new();
     statement_env.add("x".to_string(), Node::number(2));
-    Machine::new(statement, statement_env).run();
+    let mut machine = Machine::new(statement, statement_env);
+    machine.run();
+    println!("x: {}", machine.environment.get("x".to_string()));
 }

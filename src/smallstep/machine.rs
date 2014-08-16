@@ -3,7 +3,7 @@ use smallstep::environment::Environment;
 
 pub struct Machine {
     expression: Box<Node>,
-    environment: Environment
+    pub environment: Environment
 }
 
 impl Machine {
@@ -65,4 +65,14 @@ fn test_run_complex_ast_with_variables() {
     // (3 + (2 + 10)) * 10
     machine.run();
     assert_eq!(150, machine.expression.value());
+}
+
+#[test]
+fn test_environment_after_assignment() {
+    let assign = Node::assign("x".to_string(), Node::number(5));
+
+    let mut machine = Machine::new_with_empty_env(assign);
+    machine.run();
+
+    assert_eq!(5, machine.environment.get("x".to_string()).value());
 }
