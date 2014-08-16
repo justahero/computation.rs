@@ -11,7 +11,7 @@ impl Environment {
         Environment{ vars: HashMap::new() }
     }
 
-    pub fn add(&mut self, name: &str, node: Box<Node>) {
+    pub fn add(&mut self, name: String, node: Box<Node>) {
         self.vars.insert(name.to_string(), node);
     }
 
@@ -26,7 +26,7 @@ impl Environment {
 #[test]
 fn test_add_variable_to_environment() {
     let mut env = Environment::new();
-    env.add("x", Node::number(1));
+    env.add("x".to_string(), Node::number(1));
     assert_eq!(1, env.get("x".to_string()).value());
     assert_eq!("1".to_string(), env.get("x".to_string()).to_string());
 }

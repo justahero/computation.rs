@@ -30,11 +30,11 @@ impl Node {
 
     pub fn less_than(left: Box<Node>, right: Box<Node>) -> Box<Node> { box LessThan(left, right) }
 
-    pub fn variable(name: &str) -> Box<Node> { box Variable(name.to_string()) }
+    pub fn variable(name: String) -> Box<Node> { box Variable(name) }
 
     pub fn do_nothing() -> Box<Node> { box DoNothing }
 
-    pub fn assign(name: &str, expression: Box<Node>) -> Box<Node> { box Assign(name.to_string(), expression) }
+    pub fn assign(name: String, expression: Box<Node>) -> Box<Node> { box Assign(name, expression) }
 
     pub fn reducable(&self) -> bool {
         match *self {
@@ -173,15 +173,15 @@ fn test_reduce_less_than_node() {
 
 #[test]
 fn test_create_variable() {
-    let var = Node::variable("x");
+    let var = Node::variable("x".to_string());
     assert_eq!("x".to_string(), var.to_string());
 }
 
 #[test]
 fn test_environment_resolve_variable() {
-    let var = Node::variable("y");
+    let var = Node::variable("y".to_string());
     let mut env = Environment::new();
-    env.add("y", Node::number(2));
+    env.add("y".to_string(), Node::number(2));
     assert_eq!(2, var.reduce(&mut env).value());
     assert_eq!("2".to_string(), var.reduce(&mut env).to_string());
 }
@@ -195,7 +195,7 @@ fn test_creates_do_nothing_node() {
 
 #[test]
 fn test_creates_assignment_node() {
-    let assign = Node::assign("x", Node::number(2));
+    let assign = Node::assign("x".to_string(), Node::number(2));
     assert_eq!(true, assign.reducable());
     assert_eq!("x = 2".to_string(), assign.to_string());
 }

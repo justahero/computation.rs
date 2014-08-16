@@ -54,11 +54,11 @@ fn test_run_more_complex_ast() {
 #[test]
 fn test_run_complex_ast_with_variables() {
     let mut env = Environment::new();
-    env.add("y", Node::number(2));
-    env.add("x", Node::add(Node::variable("y"), Node::number(10)));
+    env.add("y".to_string(), Node::number(2));
+    env.add("x".to_string(), Node::add(Node::variable("y".to_string()), Node::number(10)));
 
     let mult = Node::multiply(
-        Node::add(Node::number(3), Node::variable("x")),
+        Node::add(Node::number(3), Node::variable("x".to_string())),
         Node::number(10)
     );
     let mut machine = Machine::new(mult, env);
