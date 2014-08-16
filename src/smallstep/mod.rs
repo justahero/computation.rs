@@ -15,6 +15,8 @@ pub enum Node {
     Boolean(bool),
     LessThan(Box<Node>, Box<Node>),
     Variable(String),
+    DoNothing,
+    Assign(String, Box<Node>),
 }
 
 impl Node {
@@ -30,10 +32,15 @@ impl Node {
 
     pub fn variable(name: &str) -> Box<Node> { box Variable(name.to_string()) }
 
+    pub fn do_nothing() -> Box<Node> { box DoNothing }
+
+    pub fn assign(name: &str, expression: Box<Node>) -> Box<Node> { box Assign(name.to_string(), expression) }
+
     pub fn reducable(&self) -> bool {
         match *self {
-            Number(_)  => { false }
-            Boolean(_) => { false }
+            Number(_)   => { false }
+            Boolean(_)  => { false }
+            DoNothing   => { false }
             _ => { true }
         }
     }
@@ -97,6 +104,8 @@ impl Show for Node {
             Boolean(value)         => write!(f, "{}", value),
             LessThan(ref l, ref r) => write!(f, "{0} < {1}", l, r),
             Variable(ref value)    => write!(f, "{}", value),
+            DoNothing              => write!(f, "do-nothing"),
+            Assign(ref n, ref e)   => write!(f, "{0} = {1}", n, e),
         }
     }
 }
@@ -175,4 +184,18 @@ fn test_environment_resolve_variable() {
     env.add("y", Node::number(2));
     assert_eq!(2, var.reduce(&mut env).value());
     assert_eq!("2".to_string(), var.reduce(&mut env).to_string());
+}
+
+#[test]
+fn test_creates_do_nothing_node() {
+    let do_nothing = Node::do_nothing();
+    assert_eq!(false, do_nothing.reducable());
+    assert_eq!("do-nothing".to_string(), do_nothing.to_string());
+}
+
+#[test]
+fn test_creates_assignment_node() {
+    let assign = Node::assign("x", Node::number(2));
+    assert_eq!(true, assign.reducable());
+    assert_eq!("x = 2".to_string(), assign.to_string());
 }
