@@ -46,4 +46,13 @@ fn main() {
             Node::add(Node::number(4), Node::number(5))
         )
     ).run();
+
+    println!("---")
+    let statement = Node::assign(
+        "x".to_string(),
+        Node::add(Node::variable("x".to_string()), Node::number(1))
+    );
+    let mut statement_env = Environment::new();
+    statement_env.add("x".to_string(), Node::number(2));
+    Machine::new(statement, statement_env).run();
 }
