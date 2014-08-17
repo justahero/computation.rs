@@ -19,6 +19,7 @@ pub enum Node {
     Assign(String, Box<Node>),
     If(Box<Node>, Box<Node>, Box<Node>),
     Sequence(Box<Node>, Box<Node>),
+    While(Box<Node>, Box<Node>),
 }
 
 impl Node {
@@ -43,6 +44,8 @@ impl Node {
     pub fn if_cond(condition: Box<Node>, left: Box<Node>) -> Box<Node> { box If(condition, left, Node::do_nothing()) }
 
     pub fn sequence(first: Box<Node>, second: Box<Node>) -> Box<Node> { box Sequence(first, second) }
+
+    pub fn while_node(cond: Box<Node>, body: Box<Node>) -> Box<Node> { box While(cond, body) }
 
     pub fn reducable(&self) -> bool {
         match *self {
@@ -123,6 +126,13 @@ impl Node {
             Sequence(ref first, ref second) => {
                 Node::sequence(first.reduce(environment), second.clone())
             }
+            While(ref cond, ref body) => {
+                Node::if_else_cond(
+                    cond.clone(),
+                    Node::sequence(body.clone(), box self.clone()),
+                    Node::do_nothing()
+                )
+            }
             _ => fail!("Non reducable type found: {}", *self)
         }
     }
@@ -141,6 +151,7 @@ impl Show for Node {
             Assign(ref n, ref e)    => write!(f, "{0} = {1}", n, e),
             If(ref c, ref l, ref r) => write!(f, "if ({0}) {1} else {2}", c, l, r),
             Sequence(ref l, ref r)  => write!(f, "{0}; {1}", l, r),
+            While(ref c, ref b)     => write!(f, "while ({0}) {1}", c, b),
         }
     }
 }
@@ -276,4 +287,17 @@ fn test_creates_sequence_node() {
     let seq = Node::sequence(Node::boolean(false), Node::number(2));
     assert_eq!(true, seq.reducable());
     assert_eq!("false; 2".to_string(), seq.to_string());
+}
+
+#[test]
+fn test_creates_while_node() {
+    // while (x < 4) { x = x + 1} => with x = 1
+    let mut env = Environment::new();
+    env.add("x".to_string(), Node::number(1));
+    let node = Node::while_node(
+        Node::less_than(Node::variable("x".to_string()), Node::number(4)),
+        Node::assign("x".to_string(), Node::add(Node::variable("x".to_string()), Node::number(1)))
+    );
+    assert_eq!(true, node.reducable());
+    assert_eq!("while (x < 4) x = x + 1".to_string(), node.to_string());
 }
