@@ -23,27 +23,19 @@ pub enum Node {
 
 impl Node {
     pub fn number(value: int) -> Box<Node> { box Number(value) }
-
     pub fn add(left: Box<Node>, right: Box<Node>) -> Box<Node> { box Add(left, right) }
-
     pub fn multiply(left: Box<Node>, right: Box<Node>) -> Box<Node> { box Multiply(left, right) }
-
     pub fn boolean(value: bool) -> Box<Node> { box Boolean(value) }
-
     pub fn less_than(left: Box<Node>, right: Box<Node>) -> Box<Node> { box LessThan(left, right) }
-
     pub fn variable(name: String) -> Box<Node> { box Variable(name) }
-
     pub fn do_nothing() -> Box<Node> { box DoNothing }
-
     pub fn assign(name: String, expression: Box<Node>) -> Box<Node> { box Assign(name, expression) }
-
     pub fn if_else_cond(condition: Box<Node>, left: Box<Node>, right: Box<Node>) -> Box<Node> { box If(condition, left, right) }
-
     pub fn if_cond(condition: Box<Node>, left: Box<Node>) -> Box<Node> { box If(condition, left, Node::do_nothing()) }
-
     pub fn sequence(first: Box<Node>, second: Box<Node>) -> Box<Node> { box Sequence(first, second) }
+}
 
+impl Node {
     pub fn reducable(&self) -> bool {
         match *self {
             Number(_)   => { false }
