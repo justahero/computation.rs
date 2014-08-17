@@ -18,6 +18,7 @@ pub enum Node {
     DoNothing,
     Assign(String, Box<Node>),
     If(Box<Node>, Box<Node>, Box<Node>),
+    Sequence(Box<Node>, Box<Node>),
 }
 
 impl Node {
@@ -40,6 +41,8 @@ impl Node {
     pub fn if_else_cond(condition: Box<Node>, left: Box<Node>, right: Box<Node>) -> Box<Node> { box If(condition, left, right) }
 
     pub fn if_cond(condition: Box<Node>, left: Box<Node>) -> Box<Node> { box If(condition, left, Node::do_nothing()) }
+
+    pub fn sequence(first: Box<Node>, second: Box<Node>) -> Box<Node> { box Sequence(first, second) }
 
     pub fn reducable(&self) -> bool {
         match *self {
@@ -114,6 +117,12 @@ impl Node {
                     }
                 }
             }
+            Sequence(box DoNothing, ref second) => {
+                second.clone()
+            }
+            Sequence(ref first, ref second) => {
+                Node::sequence(first.reduce(environment), second.clone())
+            }
             _ => fail!("Non reducable type found: {}", *self)
         }
     }
@@ -131,6 +140,7 @@ impl Show for Node {
             DoNothing               => write!(f, "do-nothing"),
             Assign(ref n, ref e)    => write!(f, "{0} = {1}", n, e),
             If(ref c, ref l, ref r) => write!(f, "if ({0}) {1} else {2}", c, l, r),
+            Sequence(ref l, ref r)  => write!(f, "{0}; {1}", l, r),
         }
     }
 }
@@ -236,6 +246,7 @@ fn test_reduce_assignment_node() {
 #[test]
 fn test_create_if_conditional() {
     let if_cond = Node::if_else_cond(Node::boolean(true), Node::number(1), Node::number(2));
+    assert_eq!(true, if_cond.reducable());
     assert_eq!("if (true) 1 else 2".to_string(), if_cond.to_string());
 }
 
@@ -258,4 +269,11 @@ fn test_run_if_conditional_with_empty_else() {
     let cond = Node::if_cond(Node::boolean(false), Node::number(1));
     let mut env = Environment::new();
     assert_eq!("do-nothing".to_string(), cond.reduce(&mut env).to_string());
+}
+
+#[test]
+fn test_creates_sequence_node() {
+    let seq = Node::sequence(Node::boolean(false), Node::number(2));
+    assert_eq!(true, seq.reducable());
+    assert_eq!("false; 2".to_string(), seq.to_string());
 }

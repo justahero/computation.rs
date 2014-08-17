@@ -76,3 +76,15 @@ fn test_environment_after_assignment() {
 
     assert_eq!(5, machine.environment.get("x".to_string()).value());
 }
+
+#[test]
+#[should_fail]
+fn test_sequence_only_accepts_assign_nodes() {
+    // Add code here
+    let seq = Node::sequence(
+        Node::number(4),
+        Node::assign("x".to_string(), Node::number(2)),
+    );
+    let mut machine = Machine::new_with_empty_env(seq);
+    machine.run();
+}

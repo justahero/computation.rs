@@ -6,31 +6,7 @@ use computation::smallstep::Node;
 use computation::smallstep::environment::*;
 use computation::smallstep::machine::*;
 
-fn main() {
-    println!("Number: {}", Node::number(100));
-    println!("Boolean: {}", Node::boolean(false));
-
-    let add = Node::add(Node::number(1), Node::number(4));
-    println!("Addition: {0}", add);
-
-    let mult = Node::multiply(Node::number(4), Node::number(3));
-    println!("Multiplication: {0}", mult);
-
-    let mut test_env = Environment::new();
-    test_env.add("x".to_string(), Node::number(2));
-    let variable = Node::variable("x".to_string());
-    println!("Variable x = {}", variable.reduce(&mut test_env));
-
-    println!("---")
-    let mut env = Environment::new();
-    env.add("x".to_string(), Node::number(3));
-    env.add("y".to_string(), Node::number(4));
-    Machine::new(
-        Node::add(Node::variable("x".to_string()), Node::variable("y".to_string())),
-        env
-    ).run();
-
-    println!("---")
+fn print_add_multiply_example() {
     Machine::new(
         Node::add(
             Node::multiply(Node::number(5), Node::number(10)),
@@ -38,16 +14,19 @@ fn main() {
         ),
         Environment::new()
     ).run();
+}
 
-    println!("---")
-    Machine::new_with_empty_env(
-        Node::less_than(
-            Node::number(10),
-            Node::add(Node::number(4), Node::number(5))
-        )
+fn print_environment_variables_example() {
+    let mut env = Environment::new();
+    env.add("x".to_string(), Node::number(3));
+    env.add("y".to_string(), Node::number(4));
+    Machine::new(
+        Node::add(Node::variable("x".to_string()), Node::variable("y".to_string())),
+        env
     ).run();
+}
 
-    println!("---")
+fn print_assignment_with_variable_example() {
     let statement = Node::assign(
         "x".to_string(),
         Node::add(Node::variable("x".to_string()), Node::number(1))
@@ -57,4 +36,27 @@ fn main() {
     let mut machine = Machine::new(statement, statement_env);
     machine.run();
     println!("x: {}", machine.environment.get("x".to_string()));
+}
+
+fn print_sequence_example() {
+    Machine::new_with_empty_env(
+        Node::sequence(
+            Node::assign("x".to_string(), Node::add(Node::number(1), Node::number(1))),
+            Node::assign("y".to_string(), Node::add(Node::variable("x".to_string()), Node::number(3)))
+        )
+    ).run();
+}
+
+fn main() {
+    println!("---");
+    print_add_multiply_example();
+
+    println!("---");
+    print_environment_variables_example();
+
+    println!("---");
+    print_assignment_with_variable_example();
+
+    println!("---")
+    print_sequence_example();
 }
