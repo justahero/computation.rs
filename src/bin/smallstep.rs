@@ -47,6 +47,16 @@ fn print_sequence_example() {
     ).run();
 }
 
+fn print_while_loop_example() {
+    let mut env = Environment::new();
+    env.add("x".to_string(), Node::number(1));
+    let node = Node::while_node(
+        Node::less_than(Node::variable("x".to_string()), Node::number(4)),
+        Node::assign("x".to_string(), Node::add(Node::variable("x".to_string()), Node::number(1)))
+    );
+    Machine::new(node, env).run();
+}
+
 fn main() {
     println!("---");
     print_add_multiply_example();
@@ -59,4 +69,7 @@ fn main() {
 
     println!("---")
     print_sequence_example();
+
+    println!("---")
+    print_while_loop_example();
 }

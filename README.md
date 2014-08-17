@@ -3,10 +3,12 @@ computation.rs
 
 A few samples from the Understanding Computation book written in Rust
 
-SmallSteps
-----------
+Small Steps Semantics
+---------------------
 
-Small steps semantics is used to create an AST that can be reduced step by step until no reduction is possible and evaluates to a final value.
+Operational Semantics define the behaviour of a program by defining structural rules of its parts. For this reduction to be executed an abstract machine is often used.
+The Small step semantics is a way to define a machine that evaluates a program by repeatedly reducing it step by step (by applying rules) until the process ends in some final value.
+In this section we follow the SIMPLE language as given in Chapter 1 of ["Understanding Computation"](http://computationbook.com/) by Tom Stuart and define the reduction rules of this language in Rust.
 
 To create a simple number.
 
@@ -25,15 +27,14 @@ Machine::new_with_empty_env(
 // => 14
 ```
 
-It is also possible to use comparison and evaluate to bool values.
+Right now there is only a single comparison expression, evaluating to a `Boolean` node.
 
 ```rust
 Machine::new_with_empty_env(
     Node::less_than(
         Node::number(10),
         Node::add(Node::number(4), Node::number(5))
-    ),
-    Environment::new()
+    )
 ).run();
 // => 10 < 4 + 5
 // => 10 < 9
@@ -84,3 +85,25 @@ Machine::new_with_empty_env(
 // => y = 5,                 (x=2)
 // => do-nothing,            (x=2, y=5)
 ```
+
+The SIMPLE language also offers support for a While loop.
+
+```
+let mut env = Environment::new();
+env.add("x".to_string(), Node::number(1));
+let node = Node::while_node(
+    Node::less_than(Node::variable("x".to_string()), Node::number(4)),
+    Node::assign("x".to_string(), Node::add(Node::variable("x".to_string()), Node::number(1)))
+);
+let mut machine = Machine::new(node, env);
+machine.run();
+// => while (x < 4) x = x + 1, (x=1)
+// => if (x < 4) x = x + 1; while (x < 4) x = x + 1 else do-nothing, (x=1)
+// => if (1 < 4) x = x + 1; while (x < 4) x = x + 1 else do-nothing, (x=1)
+// => if (true) x = x + 1; while (x < 4) x = x + 1 else do-nothing, (x=1)
+// => x = x + 1; while (x < 4) x = x + 1, (x=1)
+// => [...]
+// => do-nothing, (x=4)
+```
+
+The reduction of the `While` loop is a little more complex and turns itself into a syntactically larger program with conditional `If` and `Sequence` statements.

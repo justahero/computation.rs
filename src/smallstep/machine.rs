@@ -88,3 +88,16 @@ fn test_sequence_only_accepts_assign_nodes() {
     let mut machine = Machine::new_with_empty_env(seq);
     machine.run();
 }
+
+#[test]
+fn test_run_while_node() {
+    let mut env = Environment::new();
+    env.add("x".to_string(), Node::number(1));
+    let node = Node::while_node(
+        Node::less_than(Node::variable("x".to_string()), Node::number(4)),
+        Node::assign("x".to_string(), Node::add(Node::variable("x".to_string()), Node::number(1)))
+    );
+    let mut machine = Machine::new(node, env);
+    machine.run();
+    assert_eq!(4, machine.environment.get("x".to_string()).value());
+}
