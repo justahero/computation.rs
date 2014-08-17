@@ -25,15 +25,14 @@ Machine::new_with_empty_env(
 // => 14
 ```
 
-It is also possible to use comparison and evaluate to bool values.
+Right now there is only a single comparison expression, evaluating to a `Boolean` node.
 
 ```rust
 Machine::new_with_empty_env(
     Node::less_than(
         Node::number(10),
         Node::add(Node::number(4), Node::number(5))
-    ),
-    Environment::new()
+    )
 ).run();
 // => 10 < 4 + 5
 // => 10 < 9
