@@ -3,12 +3,12 @@ computation.rs
 
 A few samples from the Understanding Computation book written in Rust
 
-SmallSteps
-----------
+Small Steps Semantics
+---------------------
 
 Operational Semantics define the behaviour of a program by defining structural rules of its parts. For this reduction to be executed an abstract machine is often used.
-Small step semantics is a way to define a machine that evaluates a program by repeatedly reducing it step by step until some final value. Small step reductions work as formal rules of how to reduce a given program and its parts.
-In this section we follow the SIMPLE language as given in Chapter 1 of ["Understanding Computation"](http://computationbook.com/) by Tom Stuart and define the rules of this language in Rust.
+The Small step semantics is a way to define a machine that evaluates a program by repeatedly reducing it step by step (by applying rules) until the process ends in some final value.
+In this section we follow the SIMPLE language as given in Chapter 1 of ["Understanding Computation"](http://computationbook.com/) by Tom Stuart and define the reduction rules of this language in Rust.
 
 To create a simple number.
 
