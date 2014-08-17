@@ -66,3 +66,21 @@ Machine::new(statement, Environment::new()).run();
 // => if true 1 else 10
 // => 1
 ```
+
+Sequences allow to set two assignments which are evaluated in their order one by one.
+
+```rust
+Machine::new_with_empty_env(
+    Node::sequence(
+        Node::assign("x".to_string(), Node::add(Node::number(1), Node::number(1))),
+        Node::assign("y".to_string(), Node::add(Node::variable("x".to_string()), Node::number(3)))
+    )
+).run();
+// => x = 1 + 1; y = x + 3,  ()
+// => x = 2; y = x + 3,      ()
+// => do-nothing; y = x + 3, (x=2)
+// => y = x + 3,             (x=2)
+// => y = 2 + 3,             (x=2)
+// => y = 5,                 (x=2)
+// => do-nothing,            (x=2, y=5)
+```
