@@ -78,7 +78,7 @@ fn test_environment_after_assignment() {
 }
 
 #[test]
-#[should_fail]
+#[should_panic]
 fn test_sequence_only_accepts_assign_nodes() {
     // Add code here
     let seq = Node::sequence(

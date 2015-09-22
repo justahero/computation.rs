@@ -1,5 +1,3 @@
-#![feature(globs)]
-
 extern crate computation;
 
 use computation::smallstep::Node;
@@ -67,9 +65,9 @@ fn main() {
     println!("---");
     print_assignment_with_variable_example();
 
-    println!("---")
+    println!("---");
     print_sequence_example();
 
-    println!("---")
+    println!("---");
     print_while_loop_example();
 }

@@ -4,7 +4,7 @@ name = "computation-rs"
 version = "0.0.1"
 authors = [ "sebastian.ziebell@gmail.com" ]
 
-[[lib]]
+[lib]
 
 name = "computation"
 
