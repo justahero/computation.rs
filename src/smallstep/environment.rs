@@ -1,8 +1,8 @@
-use std::fmt::Show;
+use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
-use std::collections::hashmap::HashMap;
+use std::collections::HashMap;
 
 use smallstep::Node;
 
@@ -20,9 +20,9 @@ impl Environment {
     }
 
     pub fn get(&self, name: String) -> Box<Node> {
-        match self.vars.find(&(name)) {
+        match self.vars.get(&name) {
             Some(v) => { v.clone() }
-            None => fail!("Variable {} not found", name)
+            None => panic!("Variable {} not found", name)
         }
     }
 
@@ -31,7 +31,7 @@ impl Environment {
     }
 }
 
-impl Show for Environment {
+impl Display for Environment {
     fn fmt(&self, f: &mut Formatter) -> Result {
         let mut parts = Vec::new();
         for (variable, value) in self.vars.iter() {
